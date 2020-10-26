@@ -10,11 +10,21 @@ import (
 
 	"github.com/gardener/landscaper/pkg/apis/config"
 	"github.com/gardener/landscaper/pkg/apis/core/v1alpha1"
+	"github.com/gardener/landscaper/pkg/utils/kubernetes/webhook"
 )
 
 // AddActuatorToManager register the installation in a manager.
 func AddActuatorToManager(mgr manager.Manager, config *config.LandscaperConfiguration) error {
 	a, err := NewActuator(ctrl.Log.WithName("controllers").WithName("Installations"), config)
+	if err != nil {
+		return err
+	}
+
+	err = webhook.NewValidationWebhookManagedBy(mgr).
+		For(&v1alpha1.Installation{}).
+		WithValidator(&Validator{}).
+		WithName("installation").
+		Complete()
 	if err != nil {
 		return err
 	}
@@ -25,3 +35,4 @@ func AddActuatorToManager(mgr manager.Manager, config *config.LandscaperConfigur
 		Owns(&v1alpha1.Installation{}).
 		Complete(a)
 }
+

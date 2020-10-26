@@ -22,11 +22,11 @@ import (
 )
 
 // ValidateInstallation validates an Installation
-func ValidateInstallation(inst *core.Installation) field.ErrorList {
+func ValidateInstallation(inst *core.Installation) error {
 	allErrs := field.ErrorList{}
 	allErrs = append(allErrs, apivalidation.ValidateObjectMeta(&inst.ObjectMeta, true, apivalidation.NameIsDNSLabel, field.NewPath("metadata"))...)
 	allErrs = append(allErrs, ValidateInstallationSpec(&inst.Spec, field.NewPath("spec"))...)
-	return allErrs
+	return allErrs.ToAggregate()
 }
 
 // ValidateInstallationSpec validates the spec of an Installation
