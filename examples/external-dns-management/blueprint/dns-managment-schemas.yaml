@@ -1,0 +1,64 @@
+$schema: "https://json-schema.org/draft/2019-09/schema"
+
+definitions:
+
+  aws-credentials:
+    type: object
+    properties:
+      accessKeyID:
+        type: string
+      accessKeySecret:
+        type: string
+  gcp-credentials:
+    type: object
+    properties:
+      serviceaccount.json:
+        type: string
+
+  route53-provider:
+    name:
+      type: string
+    type:
+      type: string
+    credentials:
+      $ref: "#definitions/aws-credentials"
+    dnsClass:
+      type: string
+    domains:
+      type: array
+      items:
+        type: string
+    zones:
+      type: array
+      items:
+        type: string
+    required:
+    - name
+    - type
+    - credentials
+  googleCloudDNS-provider:
+    name:
+      type: string
+    type:
+      type: string
+    credentials:
+      $ref: "#definitions/gcp-credentials"
+    dnsClass:
+      type: string
+    domains:
+      type: array
+      items:
+        type: string
+    zones:
+      type: array
+      items:
+        type: string
+    required:
+    - name
+    - type
+    - credentials
+
+  provider:
+    anyOf:
+    - $ref: "#definitions/route53-provider"
+    - $ref: "#definitions/googleCloudDNS-provider"

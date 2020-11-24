@@ -1,0 +1,68 @@
+apiVersion: landscaper.gardener.cloud/v1alpha1
+kind: Blueprint
+
+jsonSchema: "https://json-schema.org/draft/2019-09/schema" # required
+
+imports:
+- name: providers
+  optional: true
+  schema:
+    type: array
+    items:
+      $ref: blueprint://dns-management-schemas.yaml#definitions/provider
+
+- name: dnsClass
+  optional: true
+  schema:
+    type: string
+
+- name: identifier
+  optional: true
+  schema:
+    type: string
+
+- name: namespace
+  default:
+    value: kube-system
+  schema:
+    type: string
+
+- name: cluster
+  targetType: landscaper.gardener.cloud/kubernetes-cluster # schema definition
+
+exports:
+- name: dnsClass
+  schema:
+    type: string
+
+deployExecutions:
+- name: my-exec
+  type: Spiff
+  file: /manifests.yaml
+  # template:
+  #   tmp:
+  #     <<<: (( &temporary ))
+  #     template:
+  #       <<<: (( &template ))
+  #       name: (( v.name ))
+  #       type: (( v.type ))
+  #       data: (( map{v.credentials|key,value|->base64(value)} ))
+  #     providers: (( sum[imports.providers|[]|s,v|->s (( "values"=*template ) read( "manifests/provider.yaml", "multiyaml" ))] ))
+
+  #   deployItems:
+  #   - name: install
+  #     type: landscaper.gardener.cloud/kubernetes-manifest
+  #     target:
+  #       name: (( imports.cluster.metadata.name ))
+  #       namespace: (( imports.cluster.metadata.namespace ))
+  #     config:
+  #       apiVersion: manifest.deployer.landscaper.gardener.cloud/v1alpha2
+  #       kind: ProviderConfiguration
+
+  #       manifests: (( sum[read( "manifests/manifests.yaml", "multiyaml" ) tmp.providers | [] | s,v | -> { "policy"="manage", "manifest"=v }] ))
+
+exportExecutions:
+- name: my-exec
+  type: Spiff
+  template:
+    dnsClass: (( imports.dnsClass || "" ))

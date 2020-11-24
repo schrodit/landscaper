@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+  namespace: (( imports.namespace ))
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dns
+      component: dns-controller-manager
+  template:
+    metadata:
+      labels:
+        app: dns
+        component: dns-controller-manager
+    spec:
+      containers:
+      - name: controller-manager
+        image: eu.gcr.io/gardener-project/dns-controller-manager:0.3.0-master
+        imagePullPolicy: "Always"
+        args:
+        - --controllers=all
+        - (( "--identifier=" imports.identifier ))
+        - (( "--dns-class=" imports.dnsClass || ~~ ))
+        - --ttl=60
+        - --server-port-http=8080
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+      serviceAccountName: "dns-controller"
+      terminationGracePeriodSeconds: 120
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "dns-controller"
+  namespace: (( imports.namespace ))
+

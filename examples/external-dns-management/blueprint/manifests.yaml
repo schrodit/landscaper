@@ -1,0 +1,22 @@
+
+tmp:
+  <<<: (( &temporary ))
+  template:
+    <<<: (( &template ))
+    name: (( v.name ))
+    type: (( v.type ))
+    data: (( map{v.credentials|key,value|->base64(value)} ))
+  providers: (( sum[imports.providers|[]|s,v|->s (( "values"=*template ) read( "manifests/provider.yaml", "multiyaml" ))] ))
+
+deployItems:
+- name: install
+  type: landscaper.gardener.cloud/kubernetes-manifest
+  target:
+    name: (( imports.cluster.metadata.name ))
+    namespace: (( imports.cluster.metadata.namespace ))
+  config:
+    apiVersion: manifest.deployer.landscaper.gardener.cloud/v1alpha2
+    kind: ProviderConfiguration
+
+    data: (( &temporary ( read("manifests/manifests.yaml", "multiyaml") tmp.providers ) ))
+    manifests: (( sum[data|[]|s,v|-> s {"policy" = "manage", "manifest" = v}] ))

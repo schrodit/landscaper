@@ -1,0 +1,18 @@
+apiVersion: dns.gardener.cloud/v1alpha1
+kind: DNSProvider
+metadata:
+  name: (( values.name ))
+  namespace: ((  imports.namespace ))
+  annotations:
+    dns.gardener.cloud/class: (( imports.dnsClass || ~~ ))
+spec:
+  type: (( values.type ))
+  secretRef:
+    name: (( values.name ))
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: (( values.name ))
+  namespace: ((  imports.namespace ))
+data: (( values.data ))

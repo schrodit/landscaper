@@ -1,0 +1,19 @@
+metadata:
+  schemaVersion: v2
+
+component:
+  name: github.com/gardener/dns-controller
+  version: 0.0.1
+
+  provider: internal
+
+  repositoryContext:
+  - type: ociRegistry
+    baseUrl: eu.gcr.io/sap-se-gcp-scp-k8s-dev/comp
+
+  localResources:
+  - name: blueprint
+    type: blueprint
+    access:
+      type: ociRegistry
+      imageReference: eu.gcr.io/sap-se-gcp-scp-k8s-dev/comp
